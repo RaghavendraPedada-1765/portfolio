@@ -1,1 +1,2 @@
-# portfolio
+Hello! I'm P Raghavendra , a passionate developer with expertise in Coding. I love creating innovative projects and contributing to open-source communities. Throughout my work, I focus on writing clean, efficient code and designing user-friendly interfaces. Feel free to explore my repositories to see my latest projects, ranging from web applications to machine learning models. If you'd like to connect or collaborate, you can reach me via email at raghavendrapedadaa@gmail.com, or find me on LinkedIn and GitHub. Thank you for visiting my portfolio—I'm always excited to share my work and learn from others!
+
