@@ -1,0 +1,213 @@
+/* ── Career Section ── */
+.career-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  place-items: center;
+  justify-content: center;
+  position: relative;
+  opacity: 1;
+  height: auto;
+  margin: auto;
+  margin-bottom: 250px;
+  padding: 120px 0;
+}
+
+/* Heading */
+.career-heading {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.career-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--accentColor);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.career-section h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 70px;
+  line-height: 70px;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(135deg, #ffffff 40%, #a78bfa 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin: 0;
+}
+
+.career-section h2 > span {
+  font-weight: 300;
+  -webkit-text-fill-color: var(--accentColor);
+}
+
+/* Info layout */
+.career-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── GSAP Timeline bar ── */
+.career-timeline {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background-image: linear-gradient(to top,
+    #7c3aed 20%,
+    var(--accentColor) 50%,
+    transparent 95%);
+  max-height: 0%;
+}
+
+/* ── GSAP Dot ── */
+.career-dot {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  background-color: #8b5cf6;
+  width: 10px;
+  height: 10px;
+  border-radius: 50px;
+  box-shadow:
+    0 0 5px 2px #c4b5fd,
+    0 0 15px 8px rgba(167, 139, 250, 0.4),
+    0 0 110px 20px rgba(167, 139, 250, 0.15);
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px 2px #c4b5fd, 0 0 15px 5px rgba(167,139,250,0.4), 0 0 40px 10px rgba(167,139,250,0.1);
+  }
+  50% {
+    box-shadow: 0 0 8px 4px #c4b5fd, 0 0 25px 10px rgba(167,139,250,0.5), 0 0 80px 20px rgba(167,139,250,0.2);
+  }
+}
+
+/* ── Career info box — GSAP animates these ── */
+.career-info-box {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+  padding: 28px 32px;
+  background: rgba(167, 139, 250, 0.03);
+  border: 1px solid rgba(167, 139, 250, 0.1);
+  border-radius: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.career-info-box:hover {
+  border-color: rgba(167, 139, 250, 0.3);
+  box-shadow: 0 0 30px rgba(167, 139, 250, 0.06);
+}
+
+.career-info-box p {
+  width: 42%;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0;
+  color: var(--textDim);
+  line-height: 1.75;
+}
+
+.career-info-in {
+  display: flex;
+  width: 42%;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.career-info h3 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 40px;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1;
+  color: rgba(167, 139, 250, 0.3);
+}
+
+.career-info h4 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  letter-spacing: 0;
+  font-weight: 600;
+  margin: 0;
+  color: var(--textPrimary);
+}
+
+.career-info h5 {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+  text-transform: uppercase;
+  margin: 8px 0 0 0;
+  color: var(--accentColor);
+}
+
+/* ── Responsive ── */
+@media only screen and (max-width: 1400px) {
+  .career-section h2 { font-size: 50px; line-height: 50px; }
+  .career-info h4    { font-size: 17px; line-height: 20px; }
+  .career-info h5    { font-size: 12px; }
+  .career-info h3    { font-size: 32px; }
+  .career-info-box p { font-size: 14px; }
+  .career-info-in    { width: 46%; gap: 16px; }
+  .career-info-box p { width: 46%; }
+}
+
+@media only screen and (max-width: 1025px) {
+  .career-section {
+    padding: 70px 0;
+    padding-top: 220px;
+    margin-top: -200px;
+    margin-bottom: 0;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .career-info-box {
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding: 20px 18px;
+  }
+  .career-info-in,
+  .career-info-box p {
+    width: 100%;
+    padding-left: 0;
+    box-sizing: border-box;
+  }
+  .career-timeline { left: 0%; }
+  .career-container { width: calc(100% - 25px); }
+}
+
+@media only screen and (max-width: 600px) {
+  .career-info { margin: 0; }
+  .career-section h2 { width: 100%; font-size: 42px; line-height: 42px; margin-top: 0; }
+  .career-info-in { gap: 0; }
+  .career-info h3 { font-size: 28px; }
+  .career-section {
+    padding-top: 90px;
+    margin-top: -70px;
+    align-items: start;
+    place-items: inherit;
+    justify-content: left;
+  }
+}

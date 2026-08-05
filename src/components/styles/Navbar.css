@@ -1,0 +1,143 @@
+/* ── Navbar ── */
+.header {
+  display: flex;
+  max-width: var(--cMaxWidth);
+  width: var(--cWidth);
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  margin-bottom: -100px;
+  box-sizing: border-box;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  z-index: 9999;
+}
+
+/* Brand initials & Jolly Roger */
+.navbar-jolly-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.jolly-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(245, 197, 24, 0.5));
+  transition: transform 0.3s ease;
+}
+
+.navbar-jolly-logo:hover .jolly-icon {
+  transform: rotate(-10deg) scale(1.1);
+}
+
+.jolly-text {
+  font-family: var(--pirateFont, "Bangers", cursive);
+  font-size: 24px;
+  letter-spacing: 3px;
+  color: var(--accentColor);
+  text-shadow: 0 0 10px rgba(245, 197, 24, 0.4);
+}
+
+.navbar-title {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--accentColor);
+  text-transform: uppercase;
+}
+
+/* Center link */
+.navbar-connect {
+  position: absolute;
+  display: none;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: 400;
+  color: var(--textMuted);
+  transition: color 0.3s;
+}
+
+.navbar-connect:hover {
+  color: var(--accentColor);
+}
+
+/* Nav links */
+.header ul {
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  column-gap: 40px;
+  row-gap: 8px;
+  align-items: end;
+}
+
+.header ul li {
+  margin-left: 0;
+  letter-spacing: 3px;
+  color: var(--textMuted);
+  font-weight: 500;
+  cursor: pointer;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.header ul li:hover {
+  color: var(--accentColor);
+}
+
+/* ── Resume button ── */
+.resume-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: 1px solid var(--accentColor);
+  border-radius: 999px;
+  color: var(--accentColor) !important;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  white-space: nowrap;
+}
+
+.resume-btn:hover {
+  background: var(--accentColor);
+  color: #020b18 !important;
+  box-shadow: 0 0 18px rgba(245, 197, 24, 0.5);
+}
+
+/* ── Responsive ── */
+@media only screen and (min-width: 500px) {
+  .header          { padding: 24px 0; }
+  .header ul       { flex-direction: row; align-items: center; font-size: 11px; }
+  .navbar-title    { font-size: 16px; }
+}
+
+@media only screen and (min-width: 900px) {
+  .navbar-connect  { display: block; }
+}
+
+@media only screen and (min-width: 1200px) {
+  .header          { padding: 35px 0; }
+  .header ul       { column-gap: 80px; }
+  .navbar-connect  { font-size: 13px; }
+  .navbar-title    { font-size: 18px; }
+}

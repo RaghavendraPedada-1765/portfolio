@@ -1,0 +1,224 @@
+/* ── Work Section ── */
+.work-section {
+  position: relative;
+  z-index: 1;
+  background-color: var(--backgroundColor);
+  padding: 100px 0 120px;
+}
+
+/* Header */
+.work-header {
+  margin-bottom: 60px;
+}
+
+.work-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--accentColor);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.work-section h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 70px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--textPrimary);
+  letter-spacing: -1px;
+}
+
+.work-section h2 > span {
+  color: var(--accentColor);
+}
+
+.work-container {
+  margin: auto;
+}
+
+/* ── 3-column grid ── */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ── Project card ── */
+.project-card {
+  position: relative;
+  padding: 28px;
+  background: rgba(167, 139, 250, 0.03);
+  border: 1px solid rgba(167, 139, 250, 0.12);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+}
+
+.project-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.project-card:hover {
+  border-color: rgba(167, 139, 250, 0.3);
+  box-shadow: 0 0 40px rgba(167, 139, 250, 0.08), 0 20px 40px rgba(0,0,0,0.3);
+  transform: translateY(-5px);
+}
+
+.project-card:hover::before {
+  opacity: 1;
+}
+
+/* Card top row */
+.project-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.project-icon {
+  font-size: 28px;
+}
+
+/* Badge */
+.project-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 30px;
+  border: 1px solid;
+}
+
+.badge-violet {
+  color: #a78bfa;
+  border-color: rgba(167, 139, 250, 0.3);
+  background: rgba(167, 139, 250, 0.08);
+}
+
+.badge-blue {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.badge-orange {
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.3);
+  background: rgba(251, 146, 60, 0.08);
+}
+
+/* Project number */
+.project-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 56px;
+  font-weight: 700;
+  color: rgba(167, 139, 250, 0.1);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -2px;
+}
+
+/* Title */
+.project-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: var(--textPrimary);
+  letter-spacing: -0.3px;
+}
+
+/* Category */
+.project-category {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--textMuted);
+  margin: 0 0 16px 0;
+  letter-spacing: 0.5px;
+}
+
+/* Description */
+.project-desc {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+  color: var(--textDim);
+  line-height: 1.7;
+  margin: 0 0 20px 0;
+  flex-grow: 1;
+}
+
+/* Stack tags */
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.project-tech {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  padding: 3px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  color: var(--textDim);
+}
+
+/* GitHub link */
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accentColor);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.3);
+  padding-bottom: 2px;
+  width: fit-content;
+  transition: color 0.3s, border-color 0.3s;
+  margin-top: auto;
+}
+
+.project-link:hover {
+  color: #c4b5fd;
+  border-color: rgba(196, 181, 253, 0.6);
+}
+
+/* ── Responsive ── */
+@media only screen and (max-width: 1400px) {
+  .work-section h2  { font-size: 52px; }
+  .project-title    { font-size: 20px; }
+  .project-num      { font-size: 44px; }
+}
+
+@media only screen and (max-width: 1025px) {
+  .projects-grid    { grid-template-columns: 1fr 1fr; }
+}
+
+@media only screen and (max-width: 900px) {
+  .work-section     { padding: 70px 0 80px; }
+  .work-section h2  { font-size: 42px; }
+  .work-header      { margin-bottom: 40px; }
+}
+
+@media only screen and (max-width: 600px) {
+  .projects-grid    { grid-template-columns: 1fr; }
+  .work-section h2  { font-size: 36px; }
+}

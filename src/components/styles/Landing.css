@@ -1,0 +1,523 @@
+/* ── One Piece Ocean Background ── */
+.ocean-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/images/ocean-bg.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  opacity: 0.18;
+  pointer-events: none;
+  filter: saturate(0.7) hue-rotate(10deg);
+}
+
+/* ── Landing Section ── */
+.landing-section {
+  width: 100%;
+  max-width: var(--cMaxWidth);
+  margin: auto;
+  position: relative;
+  height: var(--vh);
+}
+
+.landing-container {
+  width: var(--cWidth);
+  margin: auto;
+  height: 100%;
+  position: relative;
+  max-width: var(--cMaxWidth);
+}
+
+/* ── Floating ambient circles (kept for GSAP compat) ── */
+.landing-circle1 {
+  top: 0%;
+  left: 0%;
+  z-index: 15;
+  position: fixed;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.2), transparent 70%);
+  filter: blur(80px);
+  border-radius: 50%;
+  animation: loadingCircle 8s linear infinite;
+  pointer-events: none;
+}
+
+.landing-circle2 {
+  top: 50%;
+  right: 0%;
+  transform: translate(calc(100% - 2px), -50%);
+  z-index: 9;
+  position: fixed;
+  display: none;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(245, 197, 24, 0.12), transparent 70%);
+  filter: blur(70px);
+  border-radius: 50%;
+  animation: loadingCircle2 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes loadingCircle {
+  0%   { transform: translate(-95%, -75%) rotateZ(0deg); }
+  100% { transform: translate(-95%, -75%) rotateZ(360deg); }
+}
+
+@keyframes loadingCircle2 {
+  100% { transform: translate(calc(100% - 2px), -50%) rotate(360deg); }
+}
+
+/* ── Nav fade overlay ── */
+.nav-fade {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 130px;
+  background-image: linear-gradient(0deg, transparent, var(--backgroundColor) 70%);
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0;
+  left: 0;
+}
+
+/* ── Character model ── */
+.landing-video,
+.landing-image {
+  position: absolute;
+  bottom: 0;
+  height: 95%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.landing-image img {
+  height: 100%;
+  z-index: 2;
+  position: relative;
+}
+
+.character-rim {
+  position: absolute;
+  width: 550px;
+  height: 550px;
+  z-index: 1;
+  background: radial-gradient(circle, rgba(245, 197, 24, 0.25), transparent 70%);
+  filter: blur(70px);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 100%) scale(1.4);
+  opacity: 0;
+}
+
+.character-model {
+  height: 80%;
+  height: 80vh;
+  position: absolute;
+  max-width: 1920px;
+  max-height: 1080px;
+  transform: translateX(-50%);
+  width: 100%;
+  left: 50%;
+  z-index: 0;
+  bottom: 50px;
+  pointer-events: inherit;
+}
+
+.character-model::after {
+  content: "";
+  width: 100vw;
+  height: 300px;
+  background-image: linear-gradient(to bottom, transparent, var(--backgroundColor) 70%);
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9;
+  position: absolute;
+}
+
+.character-model::before {
+  content: "";
+  width: 100vw;
+  height: 700px;
+  background-color: var(--backgroundColor);
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9;
+  position: absolute;
+}
+
+.character-loaded .character-rim {
+  animation: backlight 3s forwards;
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.character-model canvas {
+  position: relative;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.character-hover {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+/* ── Left: Name block ── */
+.landing-intro {
+  position: absolute;
+  z-index: 9;
+  top: 12%;
+  left: 0;
+}
+
+/* ── Pirate Crew Label ── */
+.pirate-crew-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-family: var(--monoFont);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accentColor);
+  opacity: 0.7;
+}
+
+.crew-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(245, 197, 24, 0.5));
+}
+
+.landing-intro h2 {
+  margin: 0;
+  font-family: "JetBrains Mono", monospace;
+  color: var(--accentColor);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.landing-intro h1 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  color: var(--textPrimary);
+}
+
+.landing-intro h1 span {
+  color: var(--accentColor);
+}
+
+/* Class badge */
+.landing-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.landing-badge-mono {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--textMuted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.landing-badge-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accentColor);
+  opacity: 0.5;
+}
+
+/* ── Right: Role + Tags ── */
+.landing-info {
+  position: absolute;
+  right: 50%;
+  transform: translateX(50%);
+  bottom: 40px;
+  top: inherit;
+  z-index: 9;
+}
+
+.landing-info h3 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  font-weight: 400;
+  color: var(--textMuted);
+  margin: 0;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.landing-info h2 {
+  margin: 0;
+  margin-top: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 40px;
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.landing-h2-info-1 {
+  display: inline;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--textMuted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+h2.landing-info-h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  color: var(--accentColor);
+  font-size: 40px;
+  width: auto;
+  margin: 0;
+  position: relative;
+}
+
+/* (old GSAP scroll-reveal overlay removed) */
+
+.landing-h2-2 {
+  position: static;
+}
+
+/* Tag pills row */
+.landing-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+  max-width: 220px;
+}
+
+.landing-tag-pill {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  font-weight: 400;
+  padding: 3px 10px;
+  background: rgba(245, 197, 24, 0.07);
+  border: 1px solid rgba(245, 197, 24, 0.2);
+  border-radius: 30px;
+  color: var(--accentColor);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* ── Responsive ── */
+@media screen and (min-width: 500px) {
+  .landing-circle2 { display: block; }
+  .character-model { z-index: 0; }
+  .landing-intro h2 { font-size: 13px; }
+  .landing-intro h1 { font-size: 36px; }
+  .landing-info h3  { font-size: 13px; }
+  .landing-info h2  { font-size: 36px; line-height: 42px; }
+  h2.landing-info-h2 { font-size: 40px; }
+}
+
+@media screen and (min-width: 768px) {
+  .character-model { height: 80vh; }
+  .landing-intro h2 { font-size: 14px; }
+  .landing-intro h1 { font-size: 44px; }
+  .landing-info h3  { font-size: 14px; }
+  .landing-info h2  { font-size: 48px; line-height: 50px; }
+  h2.landing-info-h2 { font-size: 58px; }
+}
+
+@media screen and (min-width: 1025px) {
+  .character-model {
+    height: 100vh;
+    bottom: 0;
+    z-index: 11;
+    position: fixed;
+  }
+  .character-model::after,
+  .character-model::before { display: none; }
+
+  .landing-intro {
+    top: 50%;
+    left: auto;
+    right: 66%;
+    transform: translate(0%, -50%);
+  }
+  .landing-info {
+    bottom: auto;
+    top: 51%;
+    z-index: 14;
+    text-align: left;
+    transform: translate(0%, -50%);
+    right: auto;
+    left: 66%;
+    overflow: visible;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .landing-intro { right: 70%; }
+  .landing-info   { left: 70%; }
+}
+
+@media screen and (min-width: 1600px) {
+  .landing-intro h2  { font-size: 16px; letter-spacing: 4px; }
+  .landing-intro h1  { font-size: 68px; }
+  .landing-info h3   { font-size: 16px; }
+  .landing-info h2   { font-size: 70px; line-height: 68px; }
+  h2.landing-info-h2 { font-size: 78px; }
+  .landing-tags-row  { max-width: 280px; }
+  .landing-tag-pill  { font-size: 12px; }
+}
+
+/* ═══════════════════════════════════════════════
+   TV STATIC GLITCH EFFECT — Japanese → English
+═══════════════════════════════════════════════ */
+
+/* Layer 1 — fast pixel noise using gradient pattern */
+.static-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 1px,
+      rgba(255,255,255,0.03) 1px,
+      rgba(255,255,255,0.03) 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(245,197,24,0.02) 0px,
+      transparent 1px,
+      transparent 3px
+    );
+  animation: staticNoise 0.06s steps(1) infinite;
+  mix-blend-mode: screen;
+}
+
+/* Layer 2 — thick horizontal scan bars */
+.static-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 4px,
+    rgba(0, 0, 0, 0.4) 4px,
+    rgba(0, 0, 0, 0.4) 5px
+  );
+  animation: scanShift 0.07s steps(1) infinite;
+  opacity: 0.7;
+}
+
+@keyframes staticNoise {
+  0%   { transform: translate(0px,   0px);   opacity: 0.8; }
+  10%  { transform: translate(-4px,  -3px);  opacity: 0.5; }
+  20%  { transform: translate(3px,   5px);   opacity: 0.9; }
+  30%  { transform: translate(-2px,  7px);   opacity: 0.6; }
+  40%  { transform: translate(6px,   -2px);  opacity: 1.0; }
+  50%  { transform: translate(-5px,  3px);   opacity: 0.7; }
+  60%  { transform: translate(4px,   -5px);  opacity: 0.85; }
+  70%  { transform: translate(-3px,  2px);   opacity: 0.55; }
+  80%  { transform: translate(2px,   -8px);  opacity: 0.95; }
+  90%  { transform: translate(-6px,  4px);   opacity: 0.65; }
+  100% { transform: translate(1px,   0px);   opacity: 0.75; }
+}
+
+@keyframes scanShift {
+  0%   { background-position: 0 0px;    clip-path: inset(0 0 0 0); }
+  20%  { background-position: 0 -8px;   clip-path: inset(20% 0 50% 0); }
+  40%  { background-position: 0 12px;   clip-path: inset(60% 0 10% 0); }
+  60%  { background-position: 0 -5px;   clip-path: inset(10% 0 70% 0); }
+  80%  { background-position: 0 20px;   clip-path: inset(40% 0 30% 0); }
+  100% { background-position: 0 0px;    clip-path: inset(0 0 0 0); }
+}
+
+/* RGB split on all landing headings during glitch */
+.landing-glitching .landing-intro h1,
+.landing-glitching h2.landing-info-h2 {
+  animation: rgbSplit 0.1s steps(2) infinite;
+}
+
+.landing-glitching .landing-intro h2,
+.landing-glitching .landing-info h3 {
+  animation: rgbSplitSm 0.13s steps(2) infinite;
+}
+
+@keyframes rgbSplit {
+  0%   { text-shadow:  4px 0 #e63946, -4px 0 #0aa6a0;  transform: translateX(0); }
+  25%  { text-shadow: -4px 0 #e63946,  4px 0 #0aa6a0;  transform: translateX(-3px); }
+  50%  { text-shadow:  6px 0 #f5c518, -6px 0 #e63946;  transform: translateX(3px); }
+  75%  { text-shadow: -2px 0 #0aa6a0,  2px 0 #f5c518;  transform: translateX(-1px); }
+  100% { text-shadow:  4px 0 #e63946, -4px 0 #0aa6a0;  transform: translateX(0); }
+}
+
+@keyframes rgbSplitSm {
+  0%   { text-shadow:  2px 0 #e63946, -2px 0 #0aa6a0; }
+  50%  { text-shadow: -2px 0 #f5c518,  2px 0 #e63946; }
+  100% { text-shadow:  2px 0 #e63946, -2px 0 #0aa6a0; }
+}
+
+/* Whole page flicker during glitch */
+.landing-glitching {
+  animation: pageFlicker 0.1s steps(1) infinite;
+}
+
+@keyframes pageFlicker {
+  0%   { filter: brightness(1);    }
+  15%  { filter: brightness(1.3) contrast(1.2); }
+  30%  { filter: brightness(0.8) hue-rotate(20deg); }
+  50%  { filter: brightness(1.1);  }
+  70%  { filter: brightness(0.9) saturate(1.5); }
+  90%  { filter: brightness(1.2) contrast(1.1); }
+  100% { filter: brightness(1);    }
+}
+
+/* Japanese label font boost */
+.landing-intro h2.jp-label {
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 1px;
+  font-size: 14px;
+}
+
+/* JP name — slightly smaller to fit */
+.landing-name-line {
+  display: inline-block;
+}

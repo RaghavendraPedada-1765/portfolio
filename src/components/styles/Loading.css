@@ -1,0 +1,270 @@
+/* ── Loading Screen — Terminal Boot ── */
+
+.loading-screen {
+  position: fixed;
+  width: 100vw;
+  height: var(--vh);
+  background-color: #020b18;
+  z-index: 999999999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+.loading-exit {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+/* Background grid */
+.loading-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(245, 197, 24, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 197, 24, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+
+/* Ambient orbs */
+.loading-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  animation: orbFloat 6s ease-in-out infinite alternate;
+}
+
+.loading-orb-1 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.18), transparent 70%);
+  top: -10%;
+  left: -5%;
+}
+
+.loading-orb-2 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(245, 197, 24, 0.1), transparent 70%);
+  bottom: 5%;
+  right: 5%;
+  animation-delay: -3s;
+}
+
+@keyframes orbFloat {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(20px, -20px) scale(1.05); }
+}
+
+/* Terminal window */
+.terminal-window {
+  position: relative;
+  z-index: 10;
+  width: 90%;
+  max-width: 680px;
+  background: rgba(5, 15, 34, 0.95);
+  border: 1px solid rgba(245, 197, 24, 0.2);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(245, 197, 24, 0.06),
+    0 40px 80px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(230, 57, 70, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+/* Terminal title bar */
+.terminal-bar {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(245, 197, 24, 0.1);
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 7px;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.td-red    { background: #ff5f57; }
+.td-yellow { background: #febc2e; }
+.td-green  { background: #28c840; }
+
+.terminal-title {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: #64748b;
+  margin-left: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Terminal body */
+.terminal-body {
+  padding: 24px 28px 28px;
+  min-height: 220px;
+}
+
+.terminal-line {
+  margin-bottom: 10px;
+  animation: termLine 0.25s ease forwards;
+  opacity: 0;
+}
+
+@keyframes termLine {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.terminal-prompt {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: #f5c518;
+  line-height: 1.7;
+}
+
+/* Progress bar */
+.terminal-progress {
+  margin-top: 18px;
+  margin-bottom: 10px;
+}
+
+.terminal-prog-text {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: #0aa6a0;
+  white-space: pre;
+  letter-spacing: 0.5px;
+}
+
+/* Ready line */
+.terminal-ready {
+  margin-top: 14px;
+  animation: termLine 0.4s ease forwards;
+}
+
+.terminal-success {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: #f5c518;
+}
+
+.term-cursor {
+  display: inline-block;
+  animation: blink 0.8s step-end infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Header / title */
+.loading-header {
+  width: var(--cWidth);
+  max-width: var(--cMaxWidth);
+  position: fixed;
+  z-index: 9999999999;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 28px 0;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+}
+
+.loader-title {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: var(--accentColor);
+  text-transform: uppercase;
+}
+
+/* Name watermark */
+.loading-name-watermark {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: rgba(245, 197, 24, 0.15);
+  text-transform: uppercase;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* One Piece logo watermark */
+.loading-op-logo {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 40px;
+  object-fit: contain;
+  opacity: 0.2;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(245, 197, 24, 0.3));
+  z-index: 10;
+}
+
+/* Loader header Jolly Roger */
+.loader-jolly-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(245, 197, 24, 0.4));
+}
+
+.loader-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.loader-jolly-text {
+  font-family: var(--pirateFont, "Bangers", cursive);
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--accentColor);
+  text-shadow: 0 0 8px rgba(245, 197, 24, 0.4);
+}
+
+/* ── Responsive ── */
+@media only screen and (min-width: 1200px) {
+  .terminal-window {
+    max-width: 780px;
+  }
+  .terminal-prompt,
+  .terminal-prog-text,
+  .terminal-success {
+    font-size: 14px;
+  }
+  .terminal-body {
+    padding: 28px 36px 36px;
+  }
+}
+
+@media only screen and (min-width: 500px) {
+  .loading-header { padding: 24px 0; }
+  .loader-title { font-size: 17px; }
+}
