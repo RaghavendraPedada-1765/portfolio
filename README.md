@@ -14,9 +14,7 @@ Features an interactive 3D **Monkey D. Luffy** character with real-time head tra
 
 ## 📸 Preview
 
-<p align="center">
-  <img src="public/images/preview_hero.png" alt="3D Luffy Character & One Piece Theme" width="100%" />
-</p>
+
 
 <p align="center">
   <img src="public/images/preview_japanese.png" alt="Japanese Text Intro Phase" width="100%" />
