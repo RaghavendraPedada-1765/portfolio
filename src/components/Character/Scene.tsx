@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import setCharacter from "./utils/character";
+import setCharacter, { FBXAsGLTF } from "./utils/character";
 import setLighting from "./utils/lighting";
 import { useLoading } from "../../context/LoadingProvider";
 import handleResize from "./utils/resizeUtils";
@@ -19,7 +19,7 @@ const Scene = () => {
   const sceneRef = useRef(new THREE.Scene());
   const { setLoading } = useLoading();
 
-  const [character, setChar] = useState<THREE.Object3D | null>(null);
+  const [, setChar] = useState<THREE.Object3D | null>(null);
 
   useEffect(() => {
     if (canvasDiv.current) {
@@ -40,15 +40,44 @@ const Scene = () => {
 
       // Camera tuned for Luffy — full body standing
       const camera = new THREE.PerspectiveCamera(20, aspect, 0.1, 1000);
-      camera.position.set(0, 0.3, 5.5);
+      const baseCameraPos = new THREE.Vector3(0, 0.3, 5.5);
+      camera.position.copy(baseCameraPos);
       camera.lookAt(0, 0.1, 0);
       camera.zoom = 1;
       camera.updateProjectionMatrix();
+
+      // ── Ground Landing Shockwave Ring Mesh ──
+      const ringGeo = new THREE.RingGeometry(0.1, 0.5, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x00f0ff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+      });
+      const shockwaveRing = new THREE.Mesh(ringGeo, ringMat);
+      shockwaveRing.rotation.x = -Math.PI / 2;
+      shockwaveRing.position.set(0, -0.84, 0);
+      scene.add(shockwaveRing);
+
+      let shockwaveProgress = 1; // 0..1 fade
+      let cameraShakeIntensity = 0;
+
+      const triggerLandingImpact = () => {
+        // Trigger ground shockwave
+        shockwaveProgress = 0;
+        shockwaveRing.scale.set(0.2, 0.2, 0.2);
+        ringMat.opacity = 0.9;
+
+        // Camera impact shake
+        cameraShakeIntensity = 0.08;
+      };
 
       // ── VRoid head bone ──
       let headBone: THREE.Object3D | null = null;
       let mixer: THREE.AnimationMixer;
       let characterObj: THREE.Object3D | null = null;
+      let triggerJumpFn: ((onImpact?: () => void, onComplete?: () => void) => void) | null = null;
 
       // Procedural idle breathing
       let breathTime = 0;
@@ -58,12 +87,16 @@ const Scene = () => {
       let progress = setProgress((value) => setLoading(value));
       const { loadCharacter } = setCharacter(renderer, scene, camera);
 
-      loadCharacter().then((gltf) => {
-        if (gltf) {
-          const animations = setAnimations(gltf);
-          hoverDivRef.current && animations.hover(gltf, hoverDivRef.current);
+      let isLandingJumpingFn = () => false;
+
+      loadCharacter().then((asset: FBXAsGLTF | null) => {
+        if (asset) {
+          const animations = setAnimations(asset);
+          isLandingJumpingFn = animations.getIsLandingJumping;
+          triggerJumpFn = animations.triggerJump;
+          hoverDivRef.current && animations.hover(asset, hoverDivRef.current);
           mixer = animations.mixer;
-          characterObj = gltf.scene;
+          characterObj = asset.scene;
           setChar(characterObj);
 
           // Use exact runtime bone name (Three.js replaces spaces with underscores)
@@ -82,8 +115,8 @@ const Scene = () => {
           progress.loaded().then(() => {
             setTimeout(() => {
               light.turnOnLights();
-              animations.startIntro();
-            }, 2500);
+              animations.startIntro(camera, triggerLandingImpact);
+            }, 300);
           });
 
           window.addEventListener("resize", () =>
@@ -91,6 +124,19 @@ const Scene = () => {
           );
         }
       });
+
+      // ── Click / Tap to Trigger Superhero Jump & Land ──
+      const onCanvasClick = () => {
+        if (triggerJumpFn && !isLandingJumpingFn()) {
+          triggerJumpFn(triggerLandingImpact);
+        }
+      };
+
+      const canvasElem = canvasDiv.current;
+      if (canvasElem) {
+        canvasElem.style.cursor = "pointer";
+        canvasElem.addEventListener("click", onCanvasClick);
+      }
 
       let mouse = { x: 0, y: 0 },
         interpolation = { x: 0.1, y: 0.2 };
@@ -131,8 +177,28 @@ const Scene = () => {
         const delta = clock.getDelta();
         breathTime += delta;
 
-        // ── Procedural idle: gentle breathing + float ──
-        if (characterObj) {
+        const isJumping = isLandingJumpingFn();
+
+        // ── Shockwave animation loop ──
+        if (shockwaveProgress < 1) {
+          shockwaveProgress += delta * 2.2;
+          const s = 0.2 + shockwaveProgress * 3.5;
+          shockwaveRing.scale.set(s, s, s);
+          ringMat.opacity = Math.max(0, 0.9 * (1 - shockwaveProgress));
+        }
+
+        // ── Camera impact shake loop ──
+        if (cameraShakeIntensity > 0.001) {
+          camera.position.x = (Math.random() - 0.5) * cameraShakeIntensity;
+          camera.position.y = baseCameraPos.y + (Math.random() - 0.5) * cameraShakeIntensity;
+          cameraShakeIntensity *= 0.88;
+        } else {
+          camera.position.x = 0;
+          camera.position.y = baseCameraPos.y;
+        }
+
+        // ── Procedural idle: gentle breathing + float (only when not performing hero jump) ──
+        if (characterObj && !isJumping) {
           // Subtle floating up/down (breathing idle)
           characterObj.position.y =
             -0.85 + Math.sin(breathTime * 0.7) * 0.02;
@@ -149,7 +215,7 @@ const Scene = () => {
             interpolation.y,
             THREE.MathUtils.lerp
           );
-        } else if (characterObj) {
+        } else if (characterObj && !isJumping) {
           // Model level subtle mouse follow
           characterObj.rotation.y = THREE.MathUtils.lerp(
             characterObj.rotation.y,
@@ -174,6 +240,11 @@ const Scene = () => {
 
       return () => {
         clearTimeout(debounce);
+        ringGeo.dispose();
+        ringMat.dispose();
+        if (canvasElem) {
+          canvasElem.removeEventListener("click", onCanvasClick);
+        }
         scene.clear();
         renderer.dispose();
         window.removeEventListener("resize", () =>

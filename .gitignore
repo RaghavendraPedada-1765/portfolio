@@ -30,3 +30,11 @@ backup/
 Screenshot*.png
 src/*.pdf
 ._*
+
+# Raw 3D source assets (keep only processed GLB/HDR)
+*.fbx
+*.blend
+*.blend1
+
+# Python conversion scripts (local dev only)
+scripts/blender_convert.py

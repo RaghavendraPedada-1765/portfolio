@@ -18,13 +18,13 @@ const Loading = ({ percent }: { percent: number }) => {
   const [clicked, setClicked] = useState(false);
   const [visibleMessages, setVisibleMessages] = useState<number>(0);
 
-  if (percent >= 100) {
+  if (percent >= 100 && !loaded) {
     setTimeout(() => {
       setLoaded(true);
       setTimeout(() => {
         setIsLoaded(true);
-      }, 1000);
-    }, 600);
+      }, 300);
+    }, 200);
   }
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const Loading = ({ percent }: { percent: number }) => {
         clearInterval(interval);
         return prev;
       });
-    }, 420);
+    }, 150);
     return () => clearInterval(interval);
   }, []);
 
@@ -45,7 +45,7 @@ const Loading = ({ percent }: { percent: number }) => {
         setTimeout(() => {
           if (module.initialFX) module.initialFX();
           setIsLoading(false);
-        }, 900);
+        }, 200);
       }
     });
   }, [isLoaded]);
@@ -120,42 +120,49 @@ const Loading = ({ percent }: { percent: number }) => {
 
 export default Loading;
 
-/* ── Fake progress ticker (used by Character/Scene) ── */
+/* ── Fast & smooth progress ticker ── */
 export const setProgress = (setLoading: (value: number) => void) => {
   let percent: number = 0;
+  let isDone = false;
 
   let interval = setInterval(() => {
-    if (percent <= 50) {
-      let rand = Math.round(Math.random() * 5);
-      percent = percent + rand;
+    if (percent < 90) {
+      percent += Math.floor(Math.random() * 4) + 3; // Fast progress +3..+6
+      if (percent > 90) percent = 90;
       setLoading(percent);
-    } else {
-      clearInterval(interval);
-      interval = setInterval(() => {
-        percent = percent + Math.round(Math.random());
-        setLoading(percent);
-        if (percent > 91) clearInterval(interval);
-      }, 2000);
     }
-  }, 100);
+  }, 35);
+
+  // Safety fallback: auto-complete after 4.5s if network is slow
+  const safetyTimeout = setTimeout(() => {
+    if (!isDone) {
+      loaded();
+    }
+  }, 4500);
 
   function clear() {
+    isDone = true;
     clearInterval(interval);
+    clearTimeout(safetyTimeout);
     setLoading(100);
   }
 
   function loaded() {
     return new Promise<number>((resolve) => {
+      isDone = true;
       clearInterval(interval);
-      interval = setInterval(() => {
+      clearTimeout(safetyTimeout);
+
+      let finishInterval = setInterval(() => {
         if (percent < 100) {
-          percent++;
+          percent += 4;
+          if (percent > 100) percent = 100;
           setLoading(percent);
         } else {
-          resolve(percent);
-          clearInterval(interval);
+          clearInterval(finishInterval);
+          resolve(100);
         }
-      }, 2);
+      }, 15);
     });
   }
   return { loaded, percent, clear };

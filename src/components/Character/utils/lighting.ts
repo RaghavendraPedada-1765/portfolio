@@ -3,9 +3,8 @@ import { RGBELoader } from "three-stdlib";
 import { gsap } from "gsap";
 
 const setLighting = (scene: THREE.Scene) => {
-  // Key light — warm front light for VRoid face
-  const keyLight = new THREE.DirectionalLight(0xffeedd, 0);
-  keyLight.intensity = 0;
+  // Key light — warm front light for character
+  const keyLight = new THREE.DirectionalLight(0xffeedd, 1.8);
   keyLight.position.set(2, 3, 4);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.width = 1024;
@@ -13,19 +12,17 @@ const setLighting = (scene: THREE.Scene) => {
   scene.add(keyLight);
 
   // Fill light — cool purple from left
-  const fillLight = new THREE.DirectionalLight(0xa78bfa, 0);
-  fillLight.intensity = 0;
+  const fillLight = new THREE.DirectionalLight(0xa78bfa, 1.0);
   fillLight.position.set(-3, 1, 2);
   scene.add(fillLight);
 
   // Rim light — sky blue backlight
-  const rimLight = new THREE.DirectionalLight(0x38bdf8, 0);
-  rimLight.intensity = 0;
+  const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.8);
   rimLight.position.set(0, -1, -4);
   scene.add(rimLight);
 
-  // Ambient
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+  // Ambient light — clean white for base color visibility
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
   scene.add(ambientLight);
 
   // HDR environment for reflections
@@ -34,7 +31,7 @@ const setLighting = (scene: THREE.Scene) => {
     .load("char_enviorment.hdr?v=2", function (texture) {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = texture;
-      scene.environmentIntensity = 0;
+      scene.environmentIntensity = 0.8;
       scene.environmentRotation.set(5.76, 85.85, 1);
     });
 
