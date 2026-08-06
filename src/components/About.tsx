@@ -1,8 +1,20 @@
+import { lazy, Suspense } from "react";
 import "./styles/About.css";
+
+const AboutScene = lazy(() => import("./Character/AboutScene"));
 
 const About = () => {
   return (
     <div className="about-section" id="about">
+
+      {/* Left: 3D Luffy typing canvas */}
+      <div className="about-canvas-col">
+        <Suspense fallback={<div className="about-canvas-placeholder" />}>
+          <AboutScene />
+        </Suspense>
+      </div>
+
+      {/* Right: text content */}
       <div className="about-me">
 
         {/* Section label */}

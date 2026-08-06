@@ -38,3 +38,6 @@ src/*.pdf
 
 # Python conversion scripts (local dev only)
 scripts/blender_convert.py
+
+# TypeScript build info cache
+*.tsbuildinfo
