@@ -1,214 +1,100 @@
-import * as THREE from "three";
-import { useRef, useMemo, useState, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
-import { EffectComposer, N8AO } from "@react-three/postprocessing";
+import Marquee from "react-fast-marquee";
 import {
-  BallCollider,
-  Physics,
-  RigidBody,
-  CylinderCollider,
-  RapierRigidBody,
-} from "@react-three/rapier";
+  SiPython, SiReact, SiFastapi, SiTypescript, SiJavascript,
+  SiNodedotjs, SiNextdotjs, SiExpress,
+  SiMongodb, SiMysql, SiSolidity, SiEthereum,
+  SiDocker, SiArduino, SiEspressif, SiLinux, SiGit,
+  SiOpenai, SiGithubactions, SiLetsencrypt, SiRabbitmq,
+} from "react-icons/si";
+import "./styles/TechStack.css";
 
-const textureLoader = new THREE.TextureLoader();
-const imageUrls = [
-  "/images/react2.webp",
-  "/images/next2.webp",
-  "/images/node2.webp",
-  "/images/express.webp",
-  "/images/mongo.webp",
-  "/images/mysql.webp",
-  "/images/typescript.webp",
-  "/images/javascript.webp",
+/* ── Tech rows ─────────────────────────────────────────────────────────── */
+type TechItem = { Icon: React.ComponentType<{ size?: number; color?: string }>; name: string; color: string; };
+
+const ROW_1: TechItem[] = [
+  { Icon: SiPython,       name: "Python",      color: "#3776AB" },
+  { Icon: SiReact,        name: "React",        color: "#61DAFB" },
+  { Icon: SiFastapi,      name: "FastAPI",      color: "#009688" },
+  { Icon: SiTypescript,   name: "TypeScript",   color: "#3178C6" },
+  { Icon: SiJavascript,   name: "JavaScript",   color: "#F7DF1E" },
+  { Icon: SiNodedotjs,    name: "Node.js",      color: "#339933" },
+  { Icon: SiNextdotjs,    name: "Next.js",      color: "#e8dfc8" },
+  { Icon: SiExpress,      name: "Express",      color: "#9aacbf"  },
 ];
-const textures = imageUrls.map((url) => textureLoader.load(url));
 
-const sphereGeometry = new THREE.SphereGeometry(1, 28, 28);
+const ROW_2: TechItem[] = [
+  { Icon: SiMongodb,      name: "MongoDB",      color: "#47A248" },
+  { Icon: SiMysql,        name: "MySQL",         color: "#4479A1" },
+  { Icon: SiSolidity,     name: "Solidity",     color: "#a8b9cc" },
+  { Icon: SiEthereum,     name: "Ethereum",     color: "#8C8DFC" },
+  { Icon: SiOpenai,       name: "LangChain",    color: "#74aa9c" },
+  { Icon: SiRabbitmq,     name: "MQTT",         color: "#FF6600" },
+  { Icon: SiDocker,       name: "Docker",       color: "#2496ED" },
+];
 
-const spheres = [...Array(30)].map(() => ({
-  scale: [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)],
-}));
+const ROW_3: TechItem[] = [
+  { Icon: SiArduino,        name: "Arduino",      color: "#00979D" },
+  { Icon: SiEspressif,      name: "ESP32",        color: "#E7352C" },
+  { Icon: SiLinux,          name: "Linux",        color: "#FCC624" },
+  { Icon: SiGit,            name: "Git",          color: "#F05032" },
+  { Icon: SiGithubactions,  name: "CI / CD",      color: "#2088FF" },
+  { Icon: SiLetsencrypt,    name: "SHA-256",      color: "#003A70" },
+];
 
-type SphereProps = {
-  vec?: THREE.Vector3;
-  scale: number;
-  r?: typeof THREE.MathUtils.randFloatSpread;
-  material: THREE.MeshPhysicalMaterial;
-  isActive: boolean;
-};
+/* ── Pill component ─────────────────────────────────────────────────────── */
+const Pill = ({ Icon, name, color }: TechItem) => (
+  <div className="ts-pill" style={{ "--pill-color": color } as React.CSSProperties}>
+    <span className="ts-pill-icon">
+      <Icon size={22} color={color} />
+    </span>
+    <span className="ts-pill-name">{name}</span>
+  </div>
+);
 
-function SphereGeo({
-  vec = new THREE.Vector3(),
-  scale,
-  r = THREE.MathUtils.randFloatSpread,
-  material,
-  isActive,
-}: SphereProps) {
-  const api = useRef<RapierRigidBody | null>(null);
+/* ── Section divider ────────────────────────────────────────────────────── */
+const Divider = () => (
+  <div className="ts-divider" aria-hidden="true">
+    <span className="ts-divider-line" />
+    <span className="ts-divider-skull">☠</span>
+    <span className="ts-divider-line" />
+  </div>
+);
 
-  useFrame((_state, delta) => {
-    if (!isActive) return;
-    delta = Math.min(0.1, delta);
-    const impulse = vec
-      .copy(api.current!.translation())
-      .normalize()
-      .multiply(
-        new THREE.Vector3(
-          -50 * delta * scale,
-          -150 * delta * scale,
-          -50 * delta * scale
-        )
-      );
-
-    api.current?.applyImpulse(impulse, true);
-  });
-
-  return (
-    <RigidBody
-      linearDamping={0.75}
-      angularDamping={0.15}
-      friction={0.2}
-      position={[r(20), r(20) - 25, r(20) - 10]}
-      ref={api}
-      colliders={false}
-    >
-      <BallCollider args={[scale]} />
-      <CylinderCollider
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, 1.2 * scale]}
-        args={[0.15 * scale, 0.275 * scale]}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        scale={scale}
-        geometry={sphereGeometry}
-        material={material}
-        rotation={[0.3, 1, 1]}
-      />
-    </RigidBody>
-  );
-}
-
-type PointerProps = {
-  vec?: THREE.Vector3;
-  isActive: boolean;
-};
-
-function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
-  const ref = useRef<RapierRigidBody>(null);
-
-  useFrame(({ pointer, viewport }) => {
-    if (!isActive) return;
-    const targetVec = vec.lerp(
-      new THREE.Vector3(
-        (pointer.x * viewport.width) / 2,
-        (pointer.y * viewport.height) / 2,
-        0
-      ),
-      0.2
-    );
-    ref.current?.setNextKinematicTranslation(targetVec);
-  });
-
-  return (
-    <RigidBody
-      position={[100, 100, 100]}
-      type="kinematicPosition"
-      colliders={false}
-      ref={ref}
-    >
-      <BallCollider args={[2]} />
-    </RigidBody>
-  );
-}
-
-const TechStack = () => {
-  const [isActive, setIsActive] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const threshold = document
-        .getElementById("work")!
-        .getBoundingClientRect().top;
-      setIsActive(scrollY > threshold);
-    };
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
-        const interval = setInterval(() => {
-          handleScroll();
-        }, 10);
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 1000);
-      });
-    });
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-  const materials = useMemo(() => {
-    return textures.map(
-      (texture) =>
-        new THREE.MeshPhysicalMaterial({
-          map: texture,
-          emissive: "#ffffff",
-          emissiveMap: texture,
-          emissiveIntensity: 0.3,
-          metalness: 0.5,
-          roughness: 1,
-          clearcoat: 0.1,
-        })
-    );
-  }, []);
-
-  return (
-    <div className="techstack">
-      <h2> My Techstack</h2>
-
-      <Canvas
-        shadows
-        gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
-        camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
-        onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
-        className="tech-canvas"
-      >
-        <ambientLight intensity={1} />
-        <spotLight
-          position={[20, 20, 25]}
-          penumbra={1}
-          angle={0.2}
-          color="white"
-          castShadow
-          shadow-mapSize={[512, 512]}
-        />
-        <directionalLight position={[0, 5, -4]} intensity={2} />
-        <Physics gravity={[0, 0, 0]}>
-          <Pointer isActive={isActive} />
-          {spheres.map((props, i) => (
-            <SphereGeo
-              key={i}
-              {...props}
-              material={materials[Math.floor(Math.random() * materials.length)]}
-              isActive={isActive}
-            />
-          ))}
-        </Physics>
-        <Environment
-          files="/models/char_enviorment.hdr"
-          environmentIntensity={0.5}
-          environmentRotation={[0, 4, 2]}
-        />
-        <EffectComposer enableNormalPass={false}>
-          <N8AO color="#0f002c" aoRadius={2} intensity={1.15} />
-        </EffectComposer>
-      </Canvas>
+/* ── Main component ─────────────────────────────────────────────────────── */
+const TechStack = () => (
+  <section className="techstack ts-section">
+    <div className="ts-heading">
+      <p className="ts-sub">— Weapons of Choice —</p>
+      <h2>MY&nbsp;<span className="ts-accent">TECHSTACK</span></h2>
     </div>
-  );
-};
+
+    {/* Row 1 — Languages & Frameworks → left */}
+    <div className="ts-row-wrap">
+      <Marquee speed={38} gradient={false} pauseOnHover className="ts-marquee">
+        {[...ROW_1, ...ROW_1].map((t, i) => <Pill key={i} {...t} />)}
+      </Marquee>
+    </div>
+
+    <Divider />
+
+    {/* Row 2 — Data · Blockchain · AI → right */}
+    <div className="ts-row-wrap">
+      <Marquee speed={32} direction="right" gradient={false} pauseOnHover className="ts-marquee">
+        {[...ROW_2, ...ROW_2].map((t, i) => <Pill key={i} {...t} />)}
+      </Marquee>
+    </div>
+
+    <Divider />
+
+    {/* Row 3 — IoT · DevOps · Security → left */}
+    <div className="ts-row-wrap">
+      <Marquee speed={42} gradient={false} pauseOnHover className="ts-marquee">
+        {[...ROW_3, ...ROW_3].map((t, i) => <Pill key={i} {...t} />)}
+      </Marquee>
+    </div>
+
+    <div className="ts-wave-row" aria-hidden="true">{"〜".repeat(60)}</div>
+  </section>
+);
 
 export default TechStack;

@@ -1,0 +1,176 @@
+/* ── TechStack — Infinite Marquee Rows ───────────────────────────────────── */
+/* Inherits: --accentColor(gold), --accentBlue(teal), --backgroundColor(#020b18) */
+
+.ts-section {
+  position: relative;
+  width: 100%;
+  padding: 100px 0 80px;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+.ts-heading {
+  text-align: center;
+  margin-bottom: 56px;
+  position: relative;
+  z-index: 2;
+}
+
+.ts-sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--accentBlue);
+  text-transform: uppercase;
+  margin: 0 0 14px;
+  opacity: 0.8;
+}
+
+.ts-heading h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--textPrimary);
+  margin: 0;
+  /* Override the global .techstack h2 absolute positioning */
+  position: static !important;
+}
+
+.ts-accent {
+  color: var(--accentColor);
+  text-shadow: 0 0 30px rgba(245, 197, 24, 0.3);
+}
+
+/* ── Row wrapper — provides the edge fade masks ─────────────────────────── */
+.ts-row-wrap {
+  position: relative;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.ts-row-wrap::before,
+.ts-row-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ts-row-wrap::before {
+  left: 0;
+  background: linear-gradient(to right, #020b18 0%, transparent 100%);
+}
+
+.ts-row-wrap::after {
+  right: 0;
+  background: linear-gradient(to left, #020b18 0%, transparent 100%);
+}
+
+/* ── Marquee strip ───────────────────────────────────────────────────────── */
+.ts-marquee {
+  padding: 10px 0;
+}
+
+/* ── Tech Pill ───────────────────────────────────────────────────────────── */
+.ts-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px;
+  padding: 12px 22px;
+  border-radius: 100px;
+  /* Border and bg tinted with the brand color via CSS custom property */
+  border: 1px solid color-mix(in srgb, var(--pill-color, #f5c518) 30%, transparent);
+  background: color-mix(in srgb, var(--pill-color, #f5c518) 6%, transparent);
+  backdrop-filter: blur(6px);
+  cursor: default;
+  white-space: nowrap;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease,
+              background 0.3s ease;
+  user-select: none;
+}
+
+.ts-pill:hover {
+  transform: translateY(-4px) scale(1.04);
+  border-color: color-mix(in srgb, var(--pill-color, #f5c518) 65%, transparent);
+  background:   color-mix(in srgb, var(--pill-color, #f5c518) 10%, transparent);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--pill-color, #f5c518) 30%, transparent),
+    0 0  8px color-mix(in srgb, var(--pill-color, #f5c518) 18%, transparent);
+}
+
+.ts-pill-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  /* Drop shadow in brand color for extra pop */
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pill-color, #f5c518) 40%, transparent));
+  transition: filter 0.3s ease;
+}
+
+.ts-pill:hover .ts-pill-icon {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--pill-color, #f5c518) 70%, transparent));
+}
+
+.ts-pill-name {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--textPrimary);
+}
+
+/* ── Skull divider ───────────────────────────────────────────────────────── */
+.ts-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 40px;
+  opacity: 0.4;
+}
+
+.ts-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(245, 197, 24, 0.4), transparent);
+}
+
+.ts-divider-skull {
+  font-size: 18px;
+  color: var(--accentColor);
+  filter: drop-shadow(0 0 6px rgba(245, 197, 24, 0.5));
+}
+
+/* ── Ocean wave footer ───────────────────────────────────────────────────── */
+.ts-wave-row {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 4px;
+  color: var(--accentBlue);
+  opacity: 0.18;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media only screen and (max-width: 768px) {
+  .ts-section { padding: 70px 0 50px; }
+  .ts-pill { padding: 10px 16px; margin: 0 7px; }
+  .ts-pill-name { font-size: 12px; }
+  .ts-pill-icon { font-size: 17px; }
+  .ts-row-wrap::before,
+  .ts-row-wrap::after { width: 60px; }
+}

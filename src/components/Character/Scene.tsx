@@ -89,6 +89,10 @@ const Scene = () => {
 
       let isLandingJumpingFn = () => false;
 
+      // ── Named resize handler so we can properly remove it on cleanup ──
+      const onResize = () =>
+        handleResize(renderer, camera, canvasDiv, characterObj!);
+
       loadCharacter().then((asset: FBXAsGLTF | null) => {
         if (asset) {
           const animations = setAnimations(asset);
@@ -99,9 +103,8 @@ const Scene = () => {
           characterObj = asset.scene;
           setChar(characterObj);
 
-          // Use exact runtime bone name (Three.js replaces spaces with underscores)
-          headBone = characterObj.getObjectByName("head_neck_upper_216") || null;
-          console.log("[Luffy] headBone:", !!headBone, headBone?.name);
+          // Head tracking deliberately disabled — using whole-body subtle mouse tilt instead.
+          headBone = null;
 
           // ── Pose Luffy: arms relaxed at sides ──
           characterObj.traverse((bone: THREE.Object3D) => {
@@ -119,9 +122,7 @@ const Scene = () => {
             }, 300);
           });
 
-          window.addEventListener("resize", () =>
-            handleResize(renderer, camera, canvasDiv, characterObj!)
-          );
+          window.addEventListener("resize", onResize);
         }
       });
 
@@ -162,9 +163,9 @@ const Scene = () => {
         });
       };
 
-      document.addEventListener("mousemove", (event) => {
-        onMouseMove(event);
-      });
+      // Use the named onMouseMove directly (not wrapped in an extra arrow)
+      // so document.removeEventListener can actually find and remove it.
+      document.addEventListener("mousemove", onMouseMove);
 
       const landingDiv = document.getElementById("landingDiv");
       if (landingDiv) {
@@ -247,14 +248,14 @@ const Scene = () => {
         }
         scene.clear();
         renderer.dispose();
-        window.removeEventListener("resize", () =>
-          handleResize(renderer, camera, canvasDiv, characterObj!)
-        );
+        // Use the same named handler reference for proper cleanup
+        window.removeEventListener("resize", onResize);
         if (canvasDiv.current) {
           canvasDiv.current.removeChild(renderer.domElement);
         }
+        // Remove mousemove from document (same reference used in addEventListener)
+        document.removeEventListener("mousemove", onMouseMove);
         if (landingDiv) {
-          document.removeEventListener("mousemove", onMouseMove);
           landingDiv.removeEventListener("touchstart", onTouchStart);
           landingDiv.removeEventListener("touchend", onTouchEnd);
         }

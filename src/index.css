@@ -107,18 +107,19 @@ main {
   flex-wrap: nowrap;
 }
 
-/* ── Tech Stack ── */
+/* ── Tech Stack (legacy balls layout — kept for .techstack wrapper sizing) ── */
 .techstack {
   width: 100%;
   position: relative;
   overflow: clip;
-  height: var(--vh);
+  height: auto;
+  min-height: var(--vh);
   margin: auto;
-  margin-top: 50px;
-  margin-bottom: -100px;
 }
 
-.techstack h2 {
+/* The new marquee layout (.ts-section) has its own heading styles.
+   This rule only targets old h2 that aren't inside .ts-section. */
+.techstack:not(.ts-section) h2 {
   font-family: var(--monoFont);
   font-size: 80px;
   text-align: center;

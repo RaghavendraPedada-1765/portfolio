@@ -10,8 +10,34 @@ interface ParaElement extends HTMLElement {
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText);
 
+// Guard: prevent re-entrant calls triggered by our own ScrollTrigger.refresh()
+let _isRefreshing = false;
+// Guard: ensure the refresh listener is only added once
+let _refreshListenerAdded = false;
+
 export default function setSplitText() {
   ScrollTrigger.config({ ignoreMobileResize: true });
+  if (window.innerWidth < 900) return;
+
+  // Register the refresh listener exactly once, outside the split logic
+  if (!_refreshListenerAdded) {
+    _refreshListenerAdded = true;
+    ScrollTrigger.addEventListener("refresh", () => {
+      if (_isRefreshing) return; // prevent infinite loop
+      _isRefreshing = true;
+      setSplitText();
+      _isRefreshing = false;
+    });
+  }
+
+  // Wait for fonts to be ready before splitting text
+  // This prevents GSAP SplitText layout-shift / font warnings.
+  document.fonts.ready.then(() => {
+    _runSplit();
+  });
+}
+
+function _runSplit() {
   if (window.innerWidth < 900) return;
   const paras: NodeListOf<ParaElement> = document.querySelectorAll(".para");
   const titles: NodeListOf<ParaElement> = document.querySelectorAll(".title");
@@ -76,6 +102,4 @@ export default function setSplitText() {
       }
     );
   });
-
-  ScrollTrigger.addEventListener("refresh", () => setSplitText());
 }
