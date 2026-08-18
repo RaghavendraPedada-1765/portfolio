@@ -43,3 +43,4 @@ scripts/blender_convert.py
 *.tsbuildinfo
 # Vite temp timestamp files
 vite.config.ts.timestamp-*
+.vercel
