@@ -41,3 +41,5 @@ scripts/blender_convert.py
 
 # TypeScript build info cache
 *.tsbuildinfo
+# Vite temp timestamp files
+vite.config.ts.timestamp-*

@@ -211,3 +211,11 @@
     justify-content: left;
   }
 }
+
+@media only screen and (max-width: 400px) {
+  .career-section h2  { font-size: 34px; line-height: 34px; }
+  .career-section     { margin-bottom: 60px; padding: 60px 0; }
+  .career-info h3     { font-size: 22px; }
+  .career-info h4     { font-size: 15px; }
+  .career-info-box    { padding: 16px 14px; }
+}

@@ -213,3 +213,34 @@ main {
     letter-spacing: 3px;
   }
 }
+
+/* ── Mobile: allow native scrolling ── */
+@media only screen and (max-width: 1024px) {
+  body {
+    overflow: auto;
+    overflow-x: hidden;
+  }
+}
+
+/* ── Touch devices: hide custom cursor ── */
+@media (pointer: coarse) {
+  .cursor-main {
+    display: none !important;
+  }
+  * {
+    cursor: auto !important;
+  }
+}
+
+/* ── Mobile: fix GSAP smooth-wrapper to allow native scroll ── */
+@media only screen and (max-width: 1024px) {
+  #smooth-wrapper {
+    overflow: visible !important;
+    position: relative !important;
+    height: auto !important;
+  }
+  #smooth-content {
+    transform: none !important;
+    will-change: unset !important;
+  }
+}

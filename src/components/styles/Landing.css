@@ -345,42 +345,224 @@ h2.landing-info-h2 {
   white-space: nowrap;
 }
 
-/* ── Responsive ── */
-@media screen and (min-width: 500px) {
-  .landing-circle2 { display: block; }
-  .character-model { z-index: 0; }
-  .landing-intro h2 { font-size: 13px; }
-  .landing-intro h1 { font-size: 36px; }
-  .landing-info h3  { font-size: 13px; }
-  .landing-info h2  { font-size: 36px; line-height: 42px; }
-  h2.landing-info-h2 { font-size: 40px; }
+/* ═══════════════════════════════════════════
+   MOBILE-FIRST RESPONSIVE — Landing
+═══════════════════════════════════════════ */
+
+/* ── < 500px (tiny phones) ── */
+@media screen and (max-width: 499px) {
+  .landing-section {
+    height: auto;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .landing-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding-top: 90px;
+    padding-bottom: 24px;
+  }
+
+  /* Name block — top, natural flow */
+  .landing-intro {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    order: 1;
+    padding: 0 4px;
+  }
+
+  .landing-intro h2 { font-size: 11px; letter-spacing: 2px; }
+  .landing-intro h1 { font-size: 28px; line-height: 1.05; }
+  .landing-badge    { margin-top: 10px; }
+
+  /* Character model — center stage */
+  .character-container {
+    order: 2;
+    position: relative;
+    width: 100%;
+    height: 340px;
+    margin: 20px 0 10px;
+  }
+
+  .character-model {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    left: auto;
+    transform: none;
+    bottom: auto;
+    z-index: 0;
+  }
+
+  /* Role / tags block — below model */
+  .landing-info {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    top: auto;
+    transform: none;
+    order: 3;
+    text-align: left;
+    padding: 0 4px;
+  }
+
+  .landing-info h3         { font-size: 11px; white-space: normal; }
+  h2.landing-info-h2       { font-size: 32px; }
+  .landing-tags-row        { max-width: 100%; }
+  .landing-circle2         { display: none; }
 }
 
-@media screen and (min-width: 768px) {
-  .character-model { height: 80vh; }
+/* ── 500px – 767px ── */
+@media screen and (min-width: 500px) and (max-width: 767px) {
+  .landing-section {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .landing-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding-top: 90px;
+    padding-bottom: 32px;
+  }
+
+  .landing-intro {
+    position: relative;
+    top: auto; left: auto; right: auto;
+    transform: none;
+    order: 1;
+  }
+
+  .landing-intro h2 { font-size: 13px; }
+  .landing-intro h1 { font-size: 34px; }
+
+  .character-container {
+    order: 2;
+    position: relative;
+    width: 100%;
+    height: 380px;
+    margin: 24px 0 12px;
+  }
+
+  .character-model {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    left: auto;
+    transform: none;
+    bottom: auto;
+    z-index: 0;
+  }
+
+  .landing-info {
+    position: relative;
+    right: auto; bottom: auto;
+    top: auto; transform: none;
+    order: 3;
+    text-align: left;
+  }
+
+  .landing-info h3   { font-size: 12px; white-space: normal; }
+  h2.landing-info-h2 { font-size: 38px; }
+  .landing-circle2   { display: block; }
+}
+
+/* ── 768px – 1024px (tablet) ── */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .landing-section {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .landing-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding-top: 100px;
+    padding-bottom: 40px;
+  }
+
+  .landing-intro {
+    position: relative;
+    top: auto; left: auto; right: auto;
+    transform: none;
+    order: 1;
+  }
+
   .landing-intro h2 { font-size: 14px; }
   .landing-intro h1 { font-size: 44px; }
-  .landing-info h3  { font-size: 14px; }
-  .landing-info h2  { font-size: 48px; line-height: 50px; }
-  h2.landing-info-h2 { font-size: 58px; }
+
+  .character-container {
+    order: 2;
+    position: relative;
+    width: 100%;
+    height: 480px;
+    margin: 30px 0 20px;
+  }
+
+  .character-model {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    left: auto;
+    transform: none;
+    bottom: auto;
+    z-index: 0;
+  }
+
+  .landing-info {
+    position: relative;
+    right: auto; bottom: auto;
+    top: auto; transform: none;
+    order: 3;
+  }
+
+  .landing-info h3   { font-size: 14px; white-space: normal; }
+  h2.landing-info-h2 { font-size: 52px; }
+  .landing-tags-row  { max-width: 100%; }
 }
 
+/* ── Desktop (≥ 1025px) — original fixed/absolute layout ── */
 @media screen and (min-width: 1025px) {
+  .landing-section {
+    height: var(--vh);
+  }
+
+  .landing-container {
+    display: block;
+    height: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
   .character-model {
     height: 100vh;
     bottom: 0;
     z-index: 11;
     position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
   .character-model::after,
   .character-model::before { display: none; }
 
   .landing-intro {
+    position: absolute;
     top: 50%;
     left: auto;
     right: 66%;
+    bottom: auto;
     transform: translate(0%, -50%);
   }
+
   .landing-info {
     bottom: auto;
     top: 51%;
@@ -390,6 +572,7 @@ h2.landing-info-h2 {
     right: auto;
     left: 66%;
     overflow: visible;
+    position: absolute;
   }
 }
 
@@ -402,11 +585,11 @@ h2.landing-info-h2 {
   .landing-intro h2  { font-size: 16px; letter-spacing: 4px; }
   .landing-intro h1  { font-size: 68px; }
   .landing-info h3   { font-size: 16px; }
-  .landing-info h2   { font-size: 70px; line-height: 68px; }
   h2.landing-info-h2 { font-size: 78px; }
   .landing-tags-row  { max-width: 280px; }
   .landing-tag-pill  { font-size: 12px; }
 }
+
 
 /* ═══════════════════════════════════════════════
    TV STATIC GLITCH EFFECT — Japanese → English

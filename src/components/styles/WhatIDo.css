@@ -217,17 +217,35 @@
   .what-content h4 { font-size: 11px; }
 }
 
+/* ── Tablet & below: stack vertically, show skills ── */
 @media only screen and (max-width: 1024px) {
   .whatIDO {
     height: auto;
-    padding: 60px 0;
+    padding: 60px 0 80px;
     flex-direction: column;
-    gap: 40px;
+    gap: 32px;
+    align-items: flex-start;
+    place-items: unset;
+    justify-content: flex-start;
   }
-  .what-box { width: 90%; max-width: 600px; }
+  .what-box {
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+  }
   .what-title-box { justify-content: flex-start; }
-  .what-box h2 { margin: 0 0 0 0; font-size: 55px; line-height: 52px; }
-  .what-box-in { display: none; }
+  .what-box h2 {
+    margin: 0 0 32px;
+    font-size: 52px;
+    line-height: 50px;
+  }
+
+  /* Show the grid — was previously hidden */
+  .what-box-in {
+    display: block;
+    width: 100%;
+  }
+
   .what-grid {
     grid-template-columns: 1fr 1fr;
     max-width: 100%;
@@ -235,12 +253,21 @@
 }
 
 @media only screen and (max-width: 600px) {
-  .what-grid { grid-template-columns: 1fr; }
-  .what-box h2 { font-size: 44px; line-height: 42px; }
-  .whatIDO { place-items: inherit; align-items: start; justify-content: left; }
-  .what-box { max-width: calc(100% - 20px); margin: 0; }
+  .what-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .what-box h2 { font-size: 38px; line-height: 38px; }
+  .whatIDO { padding: 50px 0 60px; }
+  .what-content { padding: 18px; }
+}
+
+@media only screen and (max-width: 400px) {
+  .what-box h2 { font-size: 32px; line-height: 32px; }
+  .what-content h3 { font-size: 14px; }
 }
 
 @media only screen and (min-width: 1950px) {
   .what-box h2 { font-size: 7rem; line-height: 6.8rem; }
 }
+

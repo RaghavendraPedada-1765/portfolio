@@ -205,3 +205,10 @@
   .contact-cta       { padding: 50px 0; }
   .contact-links     { padding: 36px 0 40px; gap: 12px; }
 }
+
+@media only screen and (max-width: 400px) {
+  .contact-cta h3    { letter-spacing: -0.5px; font-size: clamp(32px, 9vw, 42px); }
+  .contact-pill      { padding: 10px 16px; font-size: 14px; gap: 8px; }
+  .contact-links     { gap: 10px; }
+  .contact-section   { padding: 60px 0 40px; }
+}

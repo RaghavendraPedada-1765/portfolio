@@ -31,3 +31,11 @@
     --size: 0px;
   }
 }
+
+/* Hide custom cursor on touch/mobile devices */
+@media (pointer: coarse) {
+  .cursor-main {
+    display: none !important;
+  }
+}
+

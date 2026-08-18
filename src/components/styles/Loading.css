@@ -268,3 +268,32 @@
   .loading-header { padding: 24px 0; }
   .loader-title { font-size: 17px; }
 }
+
+/* ── Extra small screens (< 400px) ── */
+@media only screen and (max-width: 400px) {
+  .terminal-window {
+    width: 95%;
+    border-radius: 10px;
+  }
+  .terminal-body {
+    padding: 14px 14px 18px;
+    min-height: 160px;
+  }
+  .terminal-bar {
+    padding: 10px 12px;
+  }
+  .terminal-prompt,
+  .terminal-prog-text,
+  .terminal-success {
+    font-size: 11px;
+  }
+  /* Wrap the progress bar text on tiny screens */
+  .terminal-prog-text {
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .loading-name-watermark {
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
+}
