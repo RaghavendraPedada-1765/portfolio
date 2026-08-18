@@ -21,7 +21,16 @@ const Scene = () => {
 
   const [, setChar] = useState<THREE.Object3D | null>(null);
 
+  // ── Skip 3D on mobile — models are 38MB+, too large for mobile memory ──
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
   useEffect(() => {
+    // On mobile resolve loading immediately and skip Three.js entirely
+    if (isMobile) {
+      setLoading(100);
+      return;
+    }
+
     if (canvasDiv.current) {
       let rect = canvasDiv.current.getBoundingClientRect();
       let container = { width: rect.width, height: rect.height };
@@ -33,7 +42,8 @@ const Scene = () => {
         antialias: true,
       });
       renderer.setSize(container.width, container.height);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      // Cap pixel ratio at 2 — saves ~50% GPU memory on 3x Retina screens
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.2;
       canvasDiv.current.appendChild(renderer.domElement);
@@ -101,7 +111,17 @@ const Scene = () => {
           hoverDivRef.current && animations.hover(asset, hoverDivRef.current);
           mixer = animations.mixer;
           characterObj = asset.scene;
-          setChar(characterObj);
+          scene.add(characterObj);
+
+          // Skip heavy shader compilation on low-end devices
+          const doCompile = async () => {
+            if (navigator.hardwareConcurrency > 4) {
+              await renderer.compileAsync(characterObj!, camera, scene);
+            }
+          };
+          doCompile().then(() => {
+            setChar(characterObj);
+          });
 
           // Head tracking deliberately disabled — using whole-body subtle mouse tilt instead.
           headBone = null;
@@ -262,6 +282,25 @@ const Scene = () => {
       };
     }
   }, []);
+
+  // ── Mobile fallback: static Luffy image ──
+  if (isMobile) {
+    return (
+      <div className="character-container">
+        <img
+          src="/images/preview_hero.png"
+          alt="Luffy"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            objectPosition: "center bottom",
+            display: "block",
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <>
