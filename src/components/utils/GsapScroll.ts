@@ -37,13 +37,19 @@ export function setCharTimeline(
 
   if (window.innerWidth > 1024) {
     if (character) {
+      // Ensure character-model starts at the correct CSS position on desktop.
+      // Using gsap.set() here avoids the fromTo() "from" state being injected
+      // immediately on page load, which conflicts with the CSS transform on
+      // fresh/new-device loads causing the character to be mispositioned.
+      gsap.set(".character-model", { xPercent: -50 });
+
       // tl1: Landing scroll — character rotates and moves, hero text fades.
       // At the end of this timeline the standing Luffy fades out so only
       // the sitting Luffy (AboutScene) is visible in the About section.
       tl1
         .fromTo(character.rotation, { y: 0 }, { y: 0.7, duration: 1 }, 0)
         .to(camera.position, { z: 8 }, 0)
-        .fromTo(".character-model", { xPercent: -50 }, { xPercent: -75, duration: 1 }, 0)
+        .to(".character-model", { xPercent: -75, duration: 1 }, 0)
         .to(".landing-container", { opacity: 0, duration: 0.4 }, 0)
         .to(".landing-container", { y: "40%", duration: 0.8 }, 0)
         // autoAlpha: 0 ensures .about-me is invisible on the landing section
@@ -62,9 +68,8 @@ export function setCharTimeline(
         )
         .to(".about-section", { y: "30%", duration: 6 }, 0)
         .to(".about-section", { opacity: 0, delay: 3, duration: 2 }, 0)
-        .fromTo(
+        .to(
           ".character-model",
-          { pointerEvents: "inherit" },
           { pointerEvents: "none", xPercent: -62, delay: 2, duration: 5 },
           0
         )
