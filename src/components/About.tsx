@@ -1,17 +1,30 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import "./styles/About.css";
+import SceneBoundary from "./Character/SceneBoundary";
 
 const AboutScene = lazy(() => import("./Character/AboutScene"));
 
 const About = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [showScene, setShowScene] = useState(false);
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && entry.intersectionRatio > 0) { setShowScene(true); observer.disconnect(); }
+    }, { threshold: 0.01 });
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
   return (
-    <div className="about-section" id="about">
+    <div className="about-section" id="about" ref={sectionRef}>
 
       {/* Left: 3D Luffy typing canvas */}
       <div className="about-canvas-col">
+        <SceneBoundary>
         <Suspense fallback={<div className="about-canvas-placeholder" />}>
-          <AboutScene />
+          {showScene && <AboutScene />}
         </Suspense>
+        </SceneBoundary>
       </div>
 
       {/* Right: text content */}

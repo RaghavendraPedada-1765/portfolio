@@ -44,3 +44,7 @@ scripts/blender_convert.py
 # Vite temp timestamp files
 vite.config.ts.timestamp-*
 .vercel
+
+# Browser verification output
+/test-results/
+/playwright-report/

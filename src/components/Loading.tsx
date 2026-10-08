@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./styles/Loading.css";
-import { useLoading } from "../context/LoadingProvider";
+import { useLoading } from "../context/loadingContext";
 
 const BOOT_MESSAGES = [
   "> Setting sail on the Grand Line...",
@@ -14,43 +14,23 @@ const BOOT_MESSAGES = [
 const Loading = ({ percent }: { percent: number }) => {
   const { setIsLoading } = useLoading();
   const [loaded, setLoaded] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [clicked, setClicked] = useState(false);
-  const [visibleMessages, setVisibleMessages] = useState<number>(0);
-
-  if (percent >= 100 && !loaded) {
-    setTimeout(() => {
-      setLoaded(true);
-      setTimeout(() => {
-        setIsLoaded(true);
-      }, 300);
-    }, 200);
-  }
-
+  const [visibleMessages, setVisibleMessages] = useState(0);
   useEffect(() => {
-    const interval = setInterval(() => {
-      setVisibleMessages((prev) => {
-        if (prev < BOOT_MESSAGES.length) return prev + 1;
-        clearInterval(interval);
-        return prev;
-      });
+    const interval = window.setInterval(() => {
+      setVisibleMessages((prev) => Math.min(prev + 1, BOOT_MESSAGES.length));
     }, 150);
     return () => clearInterval(interval);
   }, []);
-
   useEffect(() => {
-    import("./utils/initialFX").then((module) => {
-      if (isLoaded) {
-        setClicked(true);
-        setTimeout(() => {
-          if (module.initialFX) module.initialFX();
-          setIsLoading(false);
-        }, 200);
-      }
-    });
-  }, [isLoaded]);
+    if (percent < 100) return;
+    const ready = window.setTimeout(() => setLoaded(true), 200);
+    const exit = window.setTimeout(() => setClicked(true), 500);
+    const done = window.setTimeout(() => setIsLoading(false), 700);
+    return () => { clearTimeout(ready); clearTimeout(exit); clearTimeout(done); };
+  }, [percent, setIsLoading]);
 
-  const filled = Math.min(20, Math.round((percent / 100) * 20));
+  const filled = Math.max(0, Math.min(20, Math.round((percent / 100) * 20)));
   const empty = 20 - filled;
   const progressBar = "█".repeat(filled) + "░".repeat(empty);
 
@@ -93,7 +73,7 @@ const Loading = ({ percent }: { percent: number }) => {
               </div>
             ))}
 
-            <div className="terminal-progress">
+            <div className="terminal-progress" role="progressbar" aria-label="Loading character" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
               <span className="terminal-prog-text">
                 {`> [${progressBar}] ${percent}%`}
               </span>
@@ -110,6 +90,7 @@ const Loading = ({ percent }: { percent: number }) => {
           </div>
         </div>
 
+        <button className="skip-loading" autoFocus onClick={() => setIsLoading(false)}>Continue to portfolio</button>
         {/* One Piece logo watermark */}
         <img src="/images/onepiece-logo.png" alt="" className="loading-op-logo" />
         <div className="loading-name-watermark">RAGHAVENDRA PEDADA</div>
@@ -119,51 +100,3 @@ const Loading = ({ percent }: { percent: number }) => {
 };
 
 export default Loading;
-
-/* ── Fast & smooth progress ticker ── */
-export const setProgress = (setLoading: (value: number) => void) => {
-  let percent: number = 0;
-  let isDone = false;
-
-  let interval = setInterval(() => {
-    if (percent < 90) {
-      percent += Math.floor(Math.random() * 4) + 3; // Fast progress +3..+6
-      if (percent > 90) percent = 90;
-      setLoading(percent);
-    }
-  }, 35);
-
-  // Safety fallback: auto-complete after 4.5s if network is slow
-  const safetyTimeout = setTimeout(() => {
-    if (!isDone) {
-      loaded();
-    }
-  }, 4500);
-
-  function clear() {
-    isDone = true;
-    clearInterval(interval);
-    clearTimeout(safetyTimeout);
-    setLoading(100);
-  }
-
-  function loaded() {
-    return new Promise<number>((resolve) => {
-      isDone = true;
-      clearInterval(interval);
-      clearTimeout(safetyTimeout);
-
-      let finishInterval = setInterval(() => {
-        if (percent < 100) {
-          percent += 4;
-          if (percent > 100) percent = 100;
-          setLoading(percent);
-        } else {
-          clearInterval(finishInterval);
-          resolve(100);
-        }
-      }, 15);
-    });
-  }
-  return { loaded, percent, clear };
-};

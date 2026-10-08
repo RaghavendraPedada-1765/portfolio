@@ -1,5 +1,5 @@
 import { PropsWithChildren, useState, useEffect, useRef } from "react";
-import { useLoading } from "../context/LoadingProvider";
+import { useLoading } from "../context/loadingContext";
 import "./styles/Landing.css";
 
 /* ── Katakana scramble character pool ── */
@@ -85,29 +85,19 @@ const Landing = ({ children }: PropsWithChildren) => {
   const [isJapanese, setIsJapanese] = useState(true);
   const [isGlitching, setIsGlitching] = useState(false);
   const [scrambling, setScrambling] = useState(false);
-  const doneRef = useRef(false);  // useRef avoids re-render that would cancel the timer
 
   /* ── Trigger: 2 s after loading screen exits ── */
   useEffect(() => {
-    if (isLoading || doneRef.current) return;
-    doneRef.current = true;
-
-    const t1 = setTimeout(() => {
-      setIsGlitching(true);
-      setScrambling(true);
-
-      const t2 = setTimeout(() => {
-        setIsJapanese(false);         // swap to English mid-glitch
-        const t3 = setTimeout(() => {
-          setIsGlitching(false);
-          setScrambling(false);
-        }, 600);
-        return () => clearTimeout(t3);
-      }, 900);
-      return () => clearTimeout(t2);
-    }, 2000);
-
-    return () => clearTimeout(t1);
+    if (isLoading || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (!isLoading) setIsJapanese(false);
+      return;
+    }
+    const timers = [
+      window.setTimeout(() => { setIsGlitching(true); setScrambling(true); }, 2000),
+      window.setTimeout(() => setIsJapanese(false), 2900),
+      window.setTimeout(() => { setIsGlitching(false); setScrambling(false); }, 3500),
+    ];
+    return () => timers.forEach(clearTimeout);
   }, [isLoading]);
 
   const src = isJapanese ? JP : EN;

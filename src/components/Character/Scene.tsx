@@ -1,278 +1,138 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import setCharacter, { FBXAsGLTF } from "./utils/character";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import setCharacter from "./utils/character";
 import setLighting from "./utils/lighting";
-import { useLoading } from "../../context/LoadingProvider";
 import handleResize from "./utils/resizeUtils";
-import {
-  handleMouseMove,
-  handleTouchEnd,
-  handleHeadRotation,
-  handleTouchMove,
-} from "./utils/mouseUtils";
 import setAnimations from "./utils/animationUtils";
-import { setProgress } from "../Loading";
+import { disposeObject } from "./utils/dispose";
+import { setCharTimeline } from "../utils/GsapScroll";
+import { useLoading } from "../../context/loadingContext";
 
 const Scene = () => {
-  const canvasDiv = useRef<HTMLDivElement | null>(null);
-  const hoverDivRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef(new THREE.Scene());
+  const mountRef = useRef<HTMLDivElement>(null);
+  const [failed, setFailed] = useState(false);
+  const [ready, setReady] = useState(false);
   const { setLoading } = useLoading();
-
-  const [, setChar] = useState<THREE.Object3D | null>(null);
-
   useEffect(() => {
-    if (canvasDiv.current) {
-      let rect = canvasDiv.current.getBoundingClientRect();
-      let container = { width: rect.width, height: rect.height };
-      const aspect = container.width / container.height;
-      const scene = sceneRef.current;
-
-      const renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        antialias: true,
-      });
-      renderer.setSize(container.width, container.height);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.2;
-      canvasDiv.current.appendChild(renderer.domElement);
-
-      // Camera tuned for Luffy — full body standing
-      const camera = new THREE.PerspectiveCamera(20, aspect, 0.1, 1000);
-      const baseCameraPos = new THREE.Vector3(0, 0.3, 5.5);
-      camera.position.copy(baseCameraPos);
-      camera.lookAt(0, 0.1, 0);
-      camera.zoom = 1;
-      camera.updateProjectionMatrix();
-
-      // ── Ground Landing Shockwave Ring Mesh ──
-      const ringGeo = new THREE.RingGeometry(0.1, 0.5, 32);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x00f0ff,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0,
-        blending: THREE.AdditiveBlending,
-      });
-      const shockwaveRing = new THREE.Mesh(ringGeo, ringMat);
-      shockwaveRing.rotation.x = -Math.PI / 2;
-      shockwaveRing.position.set(0, -0.84, 0);
-      scene.add(shockwaveRing);
-
-      let shockwaveProgress = 1; // 0..1 fade
-      let cameraShakeIntensity = 0;
-
-      const triggerLandingImpact = () => {
-        // Trigger ground shockwave
-        shockwaveProgress = 0;
-        shockwaveRing.scale.set(0.2, 0.2, 0.2);
-        ringMat.opacity = 0.9;
-
-        // Camera impact shake
-        cameraShakeIntensity = 0.08;
-      };
-
-      // ── VRoid head bone ──
-      let headBone: THREE.Object3D | null = null;
-      let mixer: THREE.AnimationMixer;
-      let characterObj: THREE.Object3D | null = null;
-      let triggerJumpFn: ((onImpact?: () => void, onComplete?: () => void) => void) | null = null;
-
-      // Procedural idle breathing
-      let breathTime = 0;
-
-      const clock = new THREE.Clock();
-      const light = setLighting(scene);
-      let progress = setProgress((value) => setLoading(value));
-      const { loadCharacter } = setCharacter(renderer, scene, camera);
-
-      let isLandingJumpingFn = () => false;
-
-      // ── Named resize handler so we can properly remove it on cleanup ──
-      const onResize = () =>
-        handleResize(renderer, camera, canvasDiv, characterObj!);
-
-      loadCharacter().then((asset: FBXAsGLTF | null) => {
-        if (asset) {
-          const animations = setAnimations(asset);
-          isLandingJumpingFn = animations.getIsLandingJumping;
-          triggerJumpFn = animations.triggerJump;
-          hoverDivRef.current && animations.hover(asset, hoverDivRef.current);
-          mixer = animations.mixer;
-          characterObj = asset.scene;
-          setChar(characterObj);
-
-          // Head tracking deliberately disabled — using whole-body subtle mouse tilt instead.
-          headBone = null;
-
-          // ── Pose Luffy: arms relaxed at sides ──
-          characterObj.traverse((bone: THREE.Object3D) => {
-            const n = bone.name;
-            if (n.includes("shoulder_1.L") || n.includes("shoulder_1L")) bone.rotation.z = -1.0;
-            if (n.includes("shoulder_1.R") || n.includes("shoulder_1R")) bone.rotation.z =  1.0;
-            if (n.includes("elbow.L")     || n.includes("elbow_L"))      bone.rotation.y =  0.12;
-            if (n.includes("elbow.R")     || n.includes("elbow_R"))      bone.rotation.y = -0.12;
-          });
-
-          progress.loaded().then(() => {
-            setTimeout(() => {
-              light.turnOnLights();
-              animations.startIntro(camera, triggerLandingImpact);
-            }, 300);
-          });
-
-          window.addEventListener("resize", onResize);
+    const container = mountRef.current;
+    if (!container) return;
+    const controller = new AbortController();
+    const { signal } = controller;
+    let renderer: THREE.WebGLRenderer;
+    try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); }
+    catch { setFailed(true); setLoading(100); return; }
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(20, 1, 0.1, 100);
+    camera.position.set(0, 0.3, 5.5); camera.lookAt(0, 0.1, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    container.appendChild(renderer.domElement);
+    handleResize(renderer, camera, container);
+    setLighting(scene, signal);
+    const resize = new ResizeObserver(() => handleResize(renderer, camera, container));
+    resize.observe(container);
+    const media = gsap.matchMedia();
+    let animations: ReturnType<typeof setAnimations> | undefined;
+    // Scroll owns the parent transform; pointer motion owns the child model.
+    const scrollGroup = new THREE.Group(); scene.add(scrollGroup);
+    const ringMaterial = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.1, 0.5, 32), ringMaterial);
+    ring.rotation.x = -Math.PI / 2; ring.position.y = -0.84;
+    scrollGroup.add(ring);
+    let impact = 1;
+    let shake = 0;
+    let model: THREE.Group | undefined;
+    let frame = 0;
+    let visible = true;
+    const visibility = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
+    visibility.observe(container);
+    const pointer = { x: 0, y: 0 };
+    const onPointer = (event: PointerEvent) => {
+      pointer.x = event.clientX / window.innerWidth * 2 - 1;
+      pointer.y = event.clientY / window.innerHeight * 2 - 1;
+    };
+    document.addEventListener("pointermove", onPointer);
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const jump = () => { if (!motion.matches) animations?.triggerJump(() => { impact = 0; shake = 0.08; }); };
+    const key = (event: KeyboardEvent) => {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); jump(); }
+    };
+    container.addEventListener("click", jump);
+    container.addEventListener("keydown", key);
+    const lost = (event: Event) => {
+      event.preventDefault(); setFailed(true); setLoading(100);
+      cancelAnimationFrame(frame);
+    };
+    renderer.domElement.addEventListener("webglcontextlost", lost);
+    const clock = new THREE.Clock();
+    let elapsed = 0;
+    const animate = () => {
+      if (signal.aborted) return;
+      frame = requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), 0.05);
+      if (!visible || document.hidden) return;
+      elapsed += delta;
+      if (!motion.matches) {
+        animations?.mixer.update(delta);
+        if (model && !animations?.getIsLandingJumping()) {
+          model.position.y = -0.85 + Math.sin(elapsed * 0.7) * 0.02;
+          model.rotation.y = THREE.MathUtils.lerp(model.rotation.y, pointer.x * 0.3, 0.05);
+          model.rotation.x = THREE.MathUtils.lerp(model.rotation.x, pointer.y * 0.15, 0.05);
         }
-      });
-
-      // ── Click / Tap to Trigger Superhero Jump & Land ──
-      const onCanvasClick = () => {
-        if (triggerJumpFn && !isLandingJumpingFn()) {
-          triggerJumpFn(triggerLandingImpact);
-        }
-      };
-
-      const canvasElem = canvasDiv.current;
-      if (canvasElem) {
-        canvasElem.style.cursor = "pointer";
-        canvasElem.addEventListener("click", onCanvasClick);
       }
-
-      let mouse = { x: 0, y: 0 },
-        interpolation = { x: 0.1, y: 0.2 };
-
-      const onMouseMove = (event: MouseEvent) => {
-        handleMouseMove(event, (x, y) => (mouse = { x, y }));
-      };
-
-      let debounce: number | undefined;
-      const onTouchStart = (event: TouchEvent) => {
-        const element = event.target as HTMLElement;
-        debounce = setTimeout(() => {
-          element?.addEventListener("touchmove", (e: TouchEvent) =>
-            handleTouchMove(e, (x, y) => (mouse = { x, y }))
-          );
-        }, 200);
-      };
-
-      const onTouchEnd = () => {
-        handleTouchEnd((x, y, interpolationX, interpolationY) => {
-          mouse = { x, y };
-          interpolation = { x: interpolationX, y: interpolationY };
-        });
-      };
-
-      // Use the named onMouseMove directly (not wrapped in an extra arrow)
-      // so document.removeEventListener can actually find and remove it.
-      document.addEventListener("mousemove", onMouseMove);
-
-      const landingDiv = document.getElementById("landingDiv");
-      if (landingDiv) {
-        landingDiv.addEventListener("touchstart", onTouchStart);
-        landingDiv.addEventListener("touchend", onTouchEnd);
+      if (impact < 1) {
+        impact = Math.min(1, impact + delta * 2.2);
+        ring.scale.setScalar(0.2 + impact * 3.5);
+        ringMaterial.opacity = 0.9 * (1 - impact);
       }
-
-      const animate = () => {
-        requestAnimationFrame(animate);
-        const delta = clock.getDelta();
-        breathTime += delta;
-
-        const isJumping = isLandingJumpingFn();
-
-        // ── Shockwave animation loop ──
-        if (shockwaveProgress < 1) {
-          shockwaveProgress += delta * 2.2;
-          const s = 0.2 + shockwaveProgress * 3.5;
-          shockwaveRing.scale.set(s, s, s);
-          ringMat.opacity = Math.max(0, 0.9 * (1 - shockwaveProgress));
-        }
-
-        // ── Camera impact shake loop ──
-        if (cameraShakeIntensity > 0.001) {
-          camera.position.x = (Math.random() - 0.5) * cameraShakeIntensity;
-          camera.position.y = baseCameraPos.y + (Math.random() - 0.5) * cameraShakeIntensity;
-          cameraShakeIntensity *= 0.88;
-        } else {
-          camera.position.x = 0;
-          camera.position.y = baseCameraPos.y;
-        }
-
-        // ── Procedural idle: gentle breathing + float (only when not performing hero jump) ──
-        if (characterObj && !isJumping) {
-          // Subtle floating up/down (breathing idle)
-          characterObj.position.y =
-            -0.85 + Math.sin(breathTime * 0.7) * 0.02;
-          characterObj.rotation.z = Math.sin(breathTime * 0.4) * 0.004;
-        }
-
-        // ── Mouse tracking (Head bone if available, else subtle body tilt) ──
-        if (headBone) {
-          handleHeadRotation(
-            headBone,
-            mouse.x,
-            mouse.y,
-            interpolation.x,
-            interpolation.y,
-            THREE.MathUtils.lerp
-          );
-        } else if (characterObj && !isJumping) {
-          // Model level subtle mouse follow
-          characterObj.rotation.y = THREE.MathUtils.lerp(
-            characterObj.rotation.y,
-            mouse.x * 0.3,
-            0.05
-          );
-          characterObj.rotation.x = THREE.MathUtils.lerp(
-            characterObj.rotation.x,
-            -mouse.y * 0.15,
-            0.05
-          );
-        }
-
-        if (mixer) {
-          mixer.update(delta);
-        }
-
-        renderer.render(scene, camera);
-      };
-
-      animate();
-
-      return () => {
-        clearTimeout(debounce);
-        ringGeo.dispose();
-        ringMat.dispose();
-        if (canvasElem) {
-          canvasElem.removeEventListener("click", onCanvasClick);
-        }
-        scene.clear();
-        renderer.dispose();
-        // Use the same named handler reference for proper cleanup
-        window.removeEventListener("resize", onResize);
-        if (canvasDiv.current) {
-          canvasDiv.current.removeChild(renderer.domElement);
-        }
-        // Remove mousemove from document (same reference used in addEventListener)
-        document.removeEventListener("mousemove", onMouseMove);
-        if (landingDiv) {
-          landingDiv.removeEventListener("touchstart", onTouchStart);
-          landingDiv.removeEventListener("touchend", onTouchEnd);
-        }
-      };
-    }
-  }, []);
-
-  return (
-    <>
-      <div className="character-container">
-        <div className="character-model" ref={canvasDiv}>
-          <div className="character-rim"></div>
-          <div className="character-hover" ref={hoverDivRef}></div>
-        </div>
-      </div>
-    </>
-  );
+      // Apply shake only for this render, preserving GSAP's camera position.
+      const cameraX = camera.position.x, cameraY = camera.position.y;
+      if (!motion.matches && shake > 0.001) {
+        camera.position.x += (Math.random() - 0.5) * shake;
+        camera.position.y += (Math.random() - 0.5) * shake;
+        shake *= 0.88;
+      }
+      renderer.render(scene, camera);
+      camera.position.x = cameraX; camera.position.y = cameraY;
+    };
+    animate();
+    const timeout = window.setTimeout(() => {
+      controller.abort(); setFailed(true); setLoading(100); cancelAnimationFrame(frame);
+    }, 30000);
+    void setCharacter(renderer, scene, camera, signal, setLoading).loadCharacter().then((asset) => {
+      clearTimeout(timeout);
+      if (signal.aborted) {
+        if (asset) disposeObject(asset.scene);
+        return;
+      }
+      setLoading(100);
+      if (!asset) { setFailed(true); return; }
+      setReady(true);
+      model = asset.scene; scrollGroup.add(model);
+      animations = setAnimations(asset);
+      media.add("(min-width: 1025px) and (prefers-reduced-motion: no-preference)", () => {
+        gsap.to(".character-rim", { y: "55%", opacity: 1, duration: 2 });
+        setCharTimeline(scrollGroup, camera);
+      });
+      ScrollTrigger.refresh();
+      jump();
+    });
+    return () => {
+      clearTimeout(timeout); controller.abort(); cancelAnimationFrame(frame);
+      resize.disconnect(); visibility.disconnect(); media.revert(); animations?.dispose();
+      document.removeEventListener("pointermove", onPointer);
+      container.removeEventListener("click", jump); container.removeEventListener("keydown", key);
+      renderer.domElement.removeEventListener("webglcontextlost", lost);
+      disposeObject(scene); renderer.dispose(); renderer.domElement.remove();
+    };
+  }, [setLoading]);
+  return <div className="character-container">
+    <div className="character-model" ref={mountRef} data-scene-state={failed ? "failed" : ready ? "ready" : "loading"} role="button" tabIndex={0} aria-label="Animate Luffy character">
+      <div className="character-rim" />
+      {failed && <div className="scene-fallback">☠<span>Welcome aboard</span></div>}
+    </div>
+  </div>;
 };
-
 export default Scene;

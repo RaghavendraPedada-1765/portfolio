@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 
 export const handleMouseMove = (
   event: MouseEvent,
@@ -46,7 +47,7 @@ export const handleHeadRotation = (
 
   // Use ScrollSmoother-safe scroll detection
   const scrolled =
-    (window as any).__gsapScrollY ||
+    ScrollSmoother.get()?.scrollTop() ||
     document.documentElement.scrollTop ||
     document.body.scrollTop ||
     0;

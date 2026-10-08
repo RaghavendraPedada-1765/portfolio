@@ -1,6 +1,14 @@
 import "./styles/Career.css";
+import { useEffect } from "react";
+import gsap from "gsap";
+import { setAllTimeline } from "./utils/GsapScroll";
 
 const Career = () => {
+  useEffect(() => {
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => { setAllTimeline(); });
+    return () => media.revert();
+  }, []);
   return (
     <div className="career-section section-container">
       <div className="career-container">

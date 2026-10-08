@@ -1,92 +1,64 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import loadAboutCharacter from "./utils/aboutCharacter";
-
+import setLighting from "./utils/lighting";
+import handleResize from "./utils/resizeUtils";
+import { disposeObject } from "./utils/dispose";
 const AboutScene = () => {
   const mountRef = useRef<HTMLDivElement>(null);
-
+  const [failed, setFailed] = useState(false);
+  const [ready, setReady] = useState(false);
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
-
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-
-    // ── Renderer ──
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
-    renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    const controller = new AbortController();
+    let renderer: THREE.WebGLRenderer;
+    try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); }
+    catch { setFailed(true); return; }
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0.4, 3.2); camera.lookAt(0, 0, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
-
-    // ── Scene ──
-    const scene = new THREE.Scene();
-
-    // ── Camera — slightly elevated, looking at seated character ──
-    const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
-    camera.position.set(0, 0.4, 3.2);
-    camera.lookAt(0, 0, 0);
-
-    // ── Clock for animation ──
+    handleResize(renderer, camera, container);
+    setLighting(scene, controller.signal);
+    const resize = new ResizeObserver(() => handleResize(renderer, camera, container));
+    resize.observe(container);
+    let visible = true;
+    const visibility = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
+    visibility.observe(container);
+    let mixer: THREE.AnimationMixer | undefined;
+    let frame = 0;
     const clock = new THREE.Clock();
-    let mixer: THREE.AnimationMixer | null = null;
-    let animFrameId: number;
-    let isDisposed = false;
-
-    // ── Load character ──
-    loadAboutCharacter(renderer, scene, camera).then((asset) => {
-      if (isDisposed || !asset) return;
-      mixer = asset.mixer;
-    });
-
-    // ── Render loop ──
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const animate = () => {
-      animFrameId = requestAnimationFrame(animate);
-      const delta = clock.getDelta();
-
-      if (mixer) mixer.update(delta);
-
+      frame = requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), 0.05);
+      if (!visible || document.hidden) return;
+      if (!motion.matches) mixer?.update(delta);
       renderer.render(scene, camera);
     };
     animate();
-
-    // ── Resize ──
-    const handleResize = () => {
-      if (!container) return;
-      const nw = container.clientWidth;
-      const nh = container.clientHeight;
-      camera.aspect = nw / nh;
-      camera.updateProjectionMatrix();
-      renderer.setSize(nw, nh);
-    };
-    window.addEventListener("resize", handleResize);
-
-    // ── Cleanup ──
-    return () => {
-      isDisposed = true;
-      cancelAnimationFrame(animFrameId);
-      window.removeEventListener("resize", handleResize);
-      renderer.dispose();
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
+    const lost = (event: Event) => { event.preventDefault(); setFailed(true); cancelAnimationFrame(frame); };
+    renderer.domElement.addEventListener("webglcontextlost", lost);
+    void loadAboutCharacter(renderer, scene, camera, controller.signal).then((asset) => {
+      if (controller.signal.aborted) {
+        if (asset) { asset.mixer.stopAllAction(); disposeObject(asset.scene); }
+        return;
       }
+      if (!asset) { setFailed(true); return; }
+      mixer = asset.mixer; setReady(true);
+    });
+    return () => {
+      controller.abort(); cancelAnimationFrame(frame); resize.disconnect(); visibility.disconnect();
+      mixer?.stopAllAction(); if (mixer) mixer.uncacheRoot(mixer.getRoot());
+      renderer.domElement.removeEventListener("webglcontextlost", lost);
+      disposeObject(scene); renderer.dispose(); renderer.domElement.remove();
     };
   }, []);
-
-  return (
-    <div
-      ref={mountRef}
-      className="about-canvas-col"
-      aria-hidden="true"
-    />
-  );
+  return <div ref={mountRef} className="about-scene" data-scene-state={failed ? "failed" : ready ? "ready" : "loading"} aria-hidden="true">
+    {failed && <div className="scene-fallback">☠</div>}
+  </div>;
 };
-
 export default AboutScene;

@@ -1,4 +1,10 @@
-import Marquee from "react-fast-marquee";
+import MarqueeExport from "react-fast-marquee";
+
+// Vite 8 preserves module.exports for CommonJS imports from an ESM project.
+// Support that wrapper and the directly exported forwardRef component.
+const Marquee = "default" in MarqueeExport
+  ? (MarqueeExport as unknown as { default: typeof MarqueeExport }).default
+  : MarqueeExport;
 import {
   SiPython, SiReact, SiFastapi, SiTypescript, SiJavascript,
   SiNodedotjs, SiNextdotjs, SiExpress,

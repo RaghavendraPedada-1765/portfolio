@@ -9,25 +9,31 @@ import SocialIcons from "./SocialIcons";
 import WhatIDo from "./WhatIDo";
 import Work from "./Work";
 import setSplitText from "./utils/splitText";
+import { useLoading } from "../context/loadingContext";
+import { initialFX } from "./utils/initialFX";
 
 const TechStack = lazy(() => import("./TechStack"));
 
 const MainContainer = ({ children }: PropsWithChildren) => {
+  const { isLoading } = useLoading();
+  useEffect(() => {
+    if (!isLoading) return initialFX();
+  }, [isLoading]);
   const [isDesktopView, setIsDesktopView] = useState<boolean>(
     window.innerWidth > 1024
   );
 
   useEffect(() => {
     const resizeHandler = () => {
-      setSplitText();
       setIsDesktopView(window.innerWidth > 1024);
     };
-    resizeHandler();
+    const disposeText = setSplitText();
     window.addEventListener("resize", resizeHandler);
     return () => {
       window.removeEventListener("resize", resizeHandler);
+      disposeText();
     };
-  }, [isDesktopView]);
+  }, []);
 
   return (
     <div className="container-main">
