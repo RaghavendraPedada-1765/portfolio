@@ -28,6 +28,25 @@ const Career = () => {
             <div className="career-dot" />
           </div>
 
+          <div className="career-info-box">
+            <div className="career-info-in">
+              <div className="career-role">
+                <h4>💼 Software Testing Intern</h4>
+                <h5>IFB Automotive Pvt. Ltd.</h5>
+              </div>
+              <h3 className="career-date">
+                <time dateTime="2026-09-17">17 Sept 2026</time>
+                <br />– Present
+              </h3>
+            </div>
+            <p>
+              Tested Industrial Internet of Things (IIoT) software at IFB
+              Automotive. Alongside software testing, developed{" "}
+              <strong>IFBConnect</strong>, a chat application that runs on a local
+              network for internal communication.
+            </p>
+          </div>
+
           {/* Entry 1 — B.E. CSE */}
           <div className="career-info-box">
             <div className="career-info-in">

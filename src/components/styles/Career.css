@@ -162,6 +162,13 @@
 }
 
 /* ── Responsive ── */
+.career-info h3.career-date {
+  font-size: 14px;
+  line-height: 1.6;
+  flex-shrink: 0;
+  color: var(--textDim);
+}
+
 @media only screen and (max-width: 1400px) {
   .career-section h2 { font-size: 50px; line-height: 50px; }
   .career-info h4    { font-size: 17px; line-height: 20px; }
